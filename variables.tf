@@ -13,11 +13,11 @@ variable "cidr_block" {
 }
 
 variable "gateway_route" {
-  type = string
+  type    = string
   default = "0.0.0.0/0"
 }
 variable "slash_notion" {
-  type = number
+  type    = number
   default = 8
 }
 
@@ -37,7 +37,7 @@ variable "subnet_private_count" {
 }
 
 variable "prefix_name" {
-  type = string
+  type    = string
   default = "dev"
 }
 data "aws_availability_zones" "available" {
