@@ -8,6 +8,6 @@
   
 ## Teraform
 - Initialize Terraform by `terraform init`
-- Create a plan by  `terraform plan`
-- Apply Terraform `terraform apply` 
-- To Destroy the created resources `terraform destroy`
+- Create a plan by  `terraform plan -var-file=fileName`
+- Apply Terraform `terraform apply -var-file=fileName` 
+- To Destroy the created resources `terraform destroy -var-file=fileName`
