@@ -45,3 +45,13 @@ data "aws_availability_zones" "available" {
 }
 
 
+variable "ingress_ports" {
+  type = list(number)
+  default = [22, 80, 443, 7070]
+}
+
+
+variable "ami_id" {
+  type = string
+  default = "ami-0e150d85b63801002"
+}
