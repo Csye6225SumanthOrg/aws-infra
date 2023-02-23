@@ -61,3 +61,46 @@ resource "aws_route_table_association" "public_route_association" {
   subnet_id      = aws_subnet.public_subnet[count.index].id
   route_table_id = aws_route_table.public_route_tb.id
 }
+
+
+resource "aws_security_group" "app_sg" {
+  name        = "applicaiton_security_group"
+  description = "Allow TCP inbound traffic"
+  vpc_id      = aws_vpc.vpc_1.id
+
+  tags = {
+    Name = "app_security_group"
+  }
+
+}
+
+resource "aws_security_group_rule" "ingress_rules" {
+  security_group_id = aws_security_group.app_sg.id
+  count             = length(var.ingress_ports)
+  type              = "ingress"
+  protocol          = "tcp"
+  from_port         = var.ingress_ports[count.index]
+  to_port           = var.ingress_ports[count.index]
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+
+resource "aws_instance" "app_server" {
+  ami                         = var.ami_id
+  instance_type               = "t2.micro"
+  associate_public_ip_address = true
+
+  key_name                = "ec2_key"
+  subnet_id               = aws_subnet.public_subnet[0].id
+  disable_api_termination = true
+
+  root_block_device {
+    delete_on_termination = true
+    volume_size           = 50
+    volume_type           = "gp2"
+  }
+
+  vpc_security_group_ids = [aws_security_group.app_sg.id]
+
+
+}
