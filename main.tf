@@ -156,8 +156,8 @@ resource "aws_security_group" "database_security_group" {
     security_groups = [aws_security_group.app_sg.id]
   }
   ingress {
-    from_port  = 22
-    to_port = 22
+    from_port   = 22
+    to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -166,19 +166,19 @@ resource "aws_security_group" "database_security_group" {
 
 //rds instance..
 resource "aws_db_instance" "db_instance" {
-  allocated_storage    = 10
-  identifier           = var.db_identifier
-  db_name              = var.db_name
-  engine               = "postgres"
-  engine_version       = "14.6"
-  instance_class       = "db.t3.micro"
-  username             = var.db_user
-  password             = var.db_password
-  multi_az             = false
-  publicly_accessible  = false
-  parameter_group_name = aws_db_parameter_group.aws_db_paramGroup.name
-  skip_final_snapshot  = true
-  db_subnet_group_name = aws_db_subnet_group.db_private_subnet_group.name
+  allocated_storage      = 10
+  identifier             = var.db_identifier
+  db_name                = var.db_name
+  engine                 = "postgres"
+  engine_version         = "14.6"
+  instance_class         = "db.t3.micro"
+  username               = var.db_user
+  password               = var.db_password
+  multi_az               = false
+  publicly_accessible    = false
+  parameter_group_name   = aws_db_parameter_group.aws_db_paramGroup.name
+  skip_final_snapshot    = true
+  db_subnet_group_name   = aws_db_subnet_group.db_private_subnet_group.name
   vpc_security_group_ids = [aws_security_group.database_security_group.id]
 
 }
@@ -193,7 +193,7 @@ resource "aws_db_parameter_group" "aws_db_paramGroup" {
 
 resource "aws_db_subnet_group" "db_private_subnet_group" {
   name       = "db_private_subnet_group"
-  subnet_ids = [aws_subnet.private_subnet[0].id, aws_subnet.private_subnet[1].id,aws_subnet.private_subnet[2].id]
+  subnet_ids = [aws_subnet.private_subnet[0].id, aws_subnet.private_subnet[1].id, aws_subnet.private_subnet[2].id]
 
   tags = {
     Name = "db subnet groups"
@@ -204,14 +204,14 @@ resource "aws_instance" "app_server" {
   ami                         = var.ami_id
   instance_type               = "t2.micro"
   associate_public_ip_address = true
-  key_name                = "ec2_key"
-  subnet_id               = aws_subnet.public_subnet[0].id
-  disable_api_termination = true
-  iam_instance_profile = aws_iam_instance_profile.ec2_role_profile.name
+  key_name                    = "ec2_key"
+  subnet_id                   = aws_subnet.public_subnet[0].id
+  disable_api_termination     = true
+  iam_instance_profile        = aws_iam_instance_profile.ec2_role_profile.name
 
 
 
-    //user data script
+  //user data script
   user_data = <<EOF
     #!/bin/bash
                       #########################################################
