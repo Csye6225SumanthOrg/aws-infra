@@ -53,5 +53,31 @@ variable "ingress_ports" {
 
 variable "ami_id" {
   type    = string
-  default = "ami-0e150d85b63801002"
+  default = "ami-0fca2bd3fe0443b24"
 }
+
+variable "db_password" {
+  type    = string
+  default = "Asdqwe5640"
+}
+
+variable "db_identifier" {
+  type    = string
+  default = "csye6225"
+}
+variable "db_name" {
+  type    = string
+  default = "csye6225"
+}
+
+variable "db_user" {
+  type    = string
+  default = "csye6225"
+}
+
+variable "db_port" {
+  type    = string
+  default = "5432"
+}
+
+
