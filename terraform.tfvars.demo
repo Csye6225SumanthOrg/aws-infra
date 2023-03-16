@@ -1,3 +1,5 @@
 region     = "us-east-1"
 profile    = "demo"
 cidr_block = "10.0.0.0/16"
+domain_name= "prod.sumanthksai.me."
+ami_id="ami-0d6e25e4fa7338b55"

@@ -108,7 +108,14 @@ resource "aws_s3_bucket_acl" "example" {
   bucket = aws_s3_bucket.s3_bucket.id
   acl    = "private"
 }
+resource "aws_s3_bucket_public_access_block" "example" {
+  bucket = aws_s3_bucket.s3_bucket.id
 
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
 resource "random_string" "s3_bucket_name" {
   upper   = false
   lower   = true
@@ -307,4 +314,14 @@ resource "aws_iam_instance_profile" "ec2_role_profile" {
   role = aws_iam_role.aws_ec2_role.name
 }
 
-
+data "aws_route53_zone" "zone_name" {
+  name         = var.domain_name
+  private_zone = false
+}
+resource "aws_route53_record" "server1-record" {
+  zone_id = data.aws_route53_zone.zone_name.zone_id
+  name    = var.domain_name
+  type    = "A"
+  ttl     = "60"
+  records = [aws_instance.app_server.public_ip]
+}
