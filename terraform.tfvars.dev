@@ -1,4 +1,5 @@
 region     = "us-east-1"
 profile    = "dev"
 cidr_block = "10.0.0.0/16"
-domain_name= "dev.sumanth.me"
+domain_name= "dev.sumanthksai.me"
+ami_id= "ami-081d98b9681d366a3"

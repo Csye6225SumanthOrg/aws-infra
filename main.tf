@@ -236,9 +236,17 @@ resource "aws_instance" "app_server" {
                       echo "AWS_BUCKET_NAME=${aws_s3_bucket.s3_bucket.bucket}" >> .env
 
 
+                      #mkdir -p /home/ec2-user/webapp/logs
+                      #chmod 777 /home/ec2-user/webapp/logs
                       sudo systemctl start app
                       sudo systemctl status app
                       sudo systemctl enable app
+
+                      sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
+                      -a fetch-config \
+                      -m ec2 \
+                      -c file:/home/ec2-user/webapp/config/cloudwatch-config.json \
+                  -s
 EOF
   root_block_device {
     delete_on_termination = true
@@ -306,6 +314,11 @@ resource "aws_iam_policy_attachment" "policy_role_attach" {
   name       = "policy_role_attach"
   roles      = [aws_iam_role.aws_ec2_role.name]
   policy_arn = aws_iam_policy.aws_iam_policy_s3_access.arn
+}
+resource "aws_iam_policy_attachment" "policy_role_attach2" {
+  name       = "policy_role_attach"
+  roles      = [aws_iam_role.aws_ec2_role.name]
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
 //need to create an instance profile for ec2 role as it acts as a container for the created role
