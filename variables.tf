@@ -58,7 +58,7 @@ variable "ingress_ports" {
 
 variable "ami_id" {
   type    = string
-  default = "ami-0fca2bd3fe0443b24"
+  default = ""
 }
 
 variable "db_password" {
