@@ -24,5 +24,5 @@
                       -a fetch-config \
                       -m ec2 \
                       -c file:/home/ec2-user/webapp/config/cloudwatch-config.json \
-                  -s
+                      -s
   
