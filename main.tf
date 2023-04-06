@@ -310,7 +310,7 @@ resource "aws_security_group" "load_balancer_sg" {
   vpc_id      = aws_vpc.vpc_1.id
 
   tags = {
-    Name = "load_balancer_group"
+    Name = "load balancer group"
   }
   ingress {
     from_port       = 80
@@ -344,7 +344,7 @@ resource "aws_security_group" "load_balancer_sg" {
 # }
 
 resource "aws_security_group" "app_sg" {
-  name        = "applicaiton_security_group"
+  name        = "applicaiton security group"
   description = "Allow TCP inbound traffic"
   vpc_id      = aws_vpc.vpc_1.id
 
@@ -355,7 +355,9 @@ resource "aws_security_group" "app_sg" {
     from_port       = 22
     to_port         = 22
     protocol        = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    # cidr_blocks = ["0.0.0.0/0"]
+    security_groups = [aws_security_group.load_balancer_sg.id]
+
   }
   ingress {
     from_port       = 7070
@@ -402,12 +404,10 @@ resource "aws_launch_template" "template_launch" {
   tag_specifications {
     resource_type = "instance"
     tags = {
-      Name = "launch_template"
+      Name = "EC2_INSTANCE"
     }
   }
-  lifecycle {
-    prevent_destroy = false
-  }
+
     user_data = base64encode(templatefile("${path.module}/userdata.sh", {
          DB_USER="${aws_db_instance.db_instance.identifier}"
          DB_NAME="${aws_db_instance.db_instance.db_name}"
@@ -417,10 +417,13 @@ resource "aws_launch_template" "template_launch" {
          DB_PASSWORD="${var.db_password}"
          AWS_BUCKET_NAME="${aws_s3_bucket.s3_bucket.bucket}"
   }))
+  lifecycle {
+    prevent_destroy = false
+  }
 }
 
 resource "aws_autoscaling_group" "asg" {
-  name                      = "autoscaling_name"
+  name                      = "csye6225-asg-spring2023"
   max_size                  = 3
   min_size                  = 1
   desired_capacity = 1
@@ -443,22 +446,6 @@ resource "aws_autoscaling_group" "asg" {
  
 }
 
-
-
-# resource "aws_autoscaling_policy" "asg_cpu_policy" {
-#     name = "csye6225-asg-cpu-sw"
-#     autoscaling_group_name = aws_autoscaling_group.asg.name
-#     adjustment_type = "ChangeInCapacity"
-#     estimated_instance_warmup = 60
-#     policy_type = "TargetTrackingScaling"
-
-#     target_tracking_configuration {
-#         predefined_metric_specification {
-#             predefined_metric_type = "ASGAverageCPUUtilization"
-#          }
-#         target_value = 2
-#     }
-# }
 
 resource "aws_autoscaling_policy" "scale_up_policy" {
   name                   = "scale_up_policy"
@@ -483,7 +470,7 @@ resource "aws_cloudwatch_metric_alarm" "scale_up_alarm" {
   namespace           = "AWS/EC2"
   period              = 120
   statistic           = "Average"
-  threshold           = 10
+  threshold           = 5
 
   dimensions = {
     AutoScalingGroupName = aws_autoscaling_group.asg.name
@@ -502,7 +489,7 @@ resource "aws_cloudwatch_metric_alarm" "scale_down_alarm" {
   namespace           = "AWS/EC2"
   period              = 120
   statistic           = "Average"
-  threshold           = 5
+  threshold           = 3
 
   dimensions = {
     AutoScalingGroupName = aws_autoscaling_group.asg.name
@@ -527,18 +514,18 @@ resource "aws_lb" "lb" {
 }
 
 resource "aws_lb_target_group" "target_group" {
-  name     = "csye6225-lb-tg"
+  name     = "csye6225-lb-alb-tg"
   port     = "7070"
   target_type = "instance"
   protocol = "HTTP"
   vpc_id   = aws_vpc.vpc_1.id
-  # health_check {
-  #   healthy_threshold   = 3
-  #   unhealthy_threshold = 3
-  #   timeout             = 10
-  #   interval            = 30
-  #   path                = "/healthz"
-  # }
+  health_check {
+    healthy_threshold   = 3
+    unhealthy_threshold = 3
+    timeout             = 10
+    interval            = 30
+    path                = "/healthz"
+  }
 }
 
 resource "aws_lb_listener" "front_end" {
@@ -562,4 +549,8 @@ resource "aws_route53_record" "server1-record" {
     zone_id                = aws_lb.lb.zone_id
     evaluate_target_health = true
   }
+}
+
+resource "aws_cloudwatch_log_group" "csye6225" {
+  name = "csye6225"
 }
