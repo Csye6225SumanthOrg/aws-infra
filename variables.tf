@@ -52,7 +52,7 @@ data "aws_availability_zones" "available" {
 
 variable "ingress_ports" {
   type    = list(number)
-  default = [22,7070]
+  default = [22, 7070]
 }
 
 variable "ingress_ports_lb" {

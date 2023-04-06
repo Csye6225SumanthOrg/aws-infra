@@ -197,7 +197,7 @@ resource "aws_db_subnet_group" "db_private_subnet_group" {
 #                       #########################################################
 #                       cd /home/ec2-user/webapp
 #                       touch .env
-                      
+
 #                       echo "DB_USER=${aws_db_instance.db_instance.identifier}" >> .env
 #                       echo "DB_NAME=${aws_db_instance.db_instance.db_name}" >> .env
 #                       echo "DB_PORT=${var.db_port}" >> .env
@@ -313,15 +313,15 @@ resource "aws_security_group" "load_balancer_sg" {
     Name = "load balancer group"
   }
   ingress {
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
   ingress {
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
@@ -352,18 +352,18 @@ resource "aws_security_group" "app_sg" {
     Name = "app_security_group"
   }
   ingress {
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
     # cidr_blocks = ["0.0.0.0/0"]
     security_groups = [aws_security_group.load_balancer_sg.id]
 
   }
   ingress {
-    from_port       = 7070
-    to_port         = 7070
-    protocol        = "tcp"
-  #  cidr_blocks = ["0.0.0.0/0"]
+    from_port = 7070
+    to_port   = 7070
+    protocol  = "tcp"
+    #  cidr_blocks = ["0.0.0.0/0"]
     security_groups = [aws_security_group.load_balancer_sg.id]
   }
   egress {
@@ -388,19 +388,19 @@ resource "aws_launch_template" "template_launch" {
   iam_instance_profile {
     name = aws_iam_instance_profile.ec2_role_profile.name
   }
-  image_id = var.ami_id
+  image_id      = var.ami_id
   instance_type = "t2.micro"
-  key_name = "ec2_key"
+  key_name      = "ec2_key"
   monitoring {
     enabled = true
   }
   network_interfaces {
     associate_public_ip_address = true
-    subnet_id = aws_subnet.public_subnet[0].id
-    security_groups = [aws_security_group.app_sg.id]
+    subnet_id                   = aws_subnet.public_subnet[0].id
+    security_groups             = [aws_security_group.app_sg.id]
 
   }
-#  vpc_security_group_ids = [aws_security_group.app_sg.id]
+  #  vpc_security_group_ids = [aws_security_group.app_sg.id]
   tag_specifications {
     resource_type = "instance"
     tags = {
@@ -408,14 +408,14 @@ resource "aws_launch_template" "template_launch" {
     }
   }
 
-    user_data = base64encode(templatefile("${path.module}/userdata.sh", {
-         DB_USER="${aws_db_instance.db_instance.identifier}"
-         DB_NAME="${aws_db_instance.db_instance.db_name}"
-         DB_PORT="${var.db_port}"
-         APP_PORT="7070"
-         DB_HOSTNAME="${aws_db_instance.db_instance.address}"
-         DB_PASSWORD="${var.db_password}"
-         AWS_BUCKET_NAME="${aws_s3_bucket.s3_bucket.bucket}"
+  user_data = base64encode(templatefile("${path.module}/userdata.sh", {
+    DB_USER         = "${aws_db_instance.db_instance.identifier}"
+    DB_NAME         = "${aws_db_instance.db_instance.db_name}"
+    DB_PORT         = "${var.db_port}"
+    APP_PORT        = "7070"
+    DB_HOSTNAME     = "${aws_db_instance.db_instance.address}"
+    DB_PASSWORD     = "${var.db_password}"
+    AWS_BUCKET_NAME = "${aws_s3_bucket.s3_bucket.bucket}"
   }))
   lifecycle {
     prevent_destroy = false
@@ -423,18 +423,18 @@ resource "aws_launch_template" "template_launch" {
 }
 
 resource "aws_autoscaling_group" "asg" {
-  name                      = "csye6225-asg-spring2023"
-  max_size                  = 3
-  min_size                  = 1
+  name             = "csye6225-asg-spring2023"
+  max_size         = 3
+  min_size         = 1
   desired_capacity = 1
-  force_delete              = true
-  default_cooldown  = 60
+  force_delete     = true
+  default_cooldown = 60
 
   launch_template {
     id      = aws_launch_template.template_launch.id
     version = "$Latest"
   }
-  vpc_zone_identifier       = [for subnet in aws_subnet.public_subnet : subnet.id]
+  vpc_zone_identifier = [for subnet in aws_subnet.public_subnet : subnet.id]
 
   target_group_arns = [aws_lb_target_group.target_group.arn]
   tag {
@@ -443,7 +443,7 @@ resource "aws_autoscaling_group" "asg" {
     propagate_at_launch = true
   }
 
- 
+
 }
 
 
@@ -481,7 +481,7 @@ resource "aws_cloudwatch_metric_alarm" "scale_up_alarm" {
 }
 
 
-resource "aws_cloudwatch_metric_alarm" "scale_down_alarm" { 
+resource "aws_cloudwatch_metric_alarm" "scale_down_alarm" {
   alarm_name          = "scaledownalarm"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = 2
@@ -506,19 +506,19 @@ resource "aws_lb" "lb" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.load_balancer_sg.id]
   subnets            = [for subnet in aws_subnet.public_subnet : subnet.id]
-#  enable_deletion_protection = false
+  #  enable_deletion_protection = false
 
   tags = {
     Application = "WebApp"
- }
+  }
 }
 
 resource "aws_lb_target_group" "target_group" {
-  name     = "csye6225-lb-alb-tg"
-  port     = "7070"
+  name        = "csye6225-lb-alb-tg"
+  port        = "7070"
   target_type = "instance"
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.vpc_1.id
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.vpc_1.id
   health_check {
     healthy_threshold   = 3
     unhealthy_threshold = 3
@@ -544,7 +544,7 @@ resource "aws_route53_record" "server1-record" {
   zone_id = data.aws_route53_zone.zone_name.zone_id
   name    = var.domain_name
   type    = "A"
-   alias {
+  alias {
     name                   = aws_lb.lb.dns_name
     zone_id                = aws_lb.lb.zone_id
     evaluate_target_health = true
