@@ -11,3 +11,6 @@
 - Create a plan by  `terraform plan -var-file=fileName`
 - Apply Terraform `terraform apply -var-file=fileName` 
 - To Destroy the created resources `terraform destroy -var-file=fileName`
+
+## Importing certificate 
+`aws --profile demo acm import-certificate --server-certificate-name certificate_object_name  --certificate-body file://fileName  --private-key file://fileName --certificate-chain file://fileName`

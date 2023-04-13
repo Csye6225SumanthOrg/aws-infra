@@ -89,4 +89,12 @@ variable "db_port" {
   default = "5432"
 }
 
+variable "account_id"{
+  type = string
+  default = "422033674089"
+}
 
+variable "certificate_arn"{
+  type = string
+  //default = "arn:aws:acm:us-east-1:422033674089:certificate/62b292e9-0872-4d1e-878f-ec0cb1beea18"
+}
